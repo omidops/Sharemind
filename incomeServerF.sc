@@ -1,0 +1,184 @@
+/*
+ * Copyright (C) 2018 Cybernetica
+ *
+ * Research/Commercial License Usage
+ * Licensees holding a valid Research License or Commercial License
+ * for the Software may use this file according to the written
+ * agreement between you and Cybernetica.
+ *
+ * GNU General Public License Usage
+ * Alternatively, this file may be used under the terms of the GNU
+ * General Public License version 3.0 as published by the Free Software
+ * Foundation and appearing in the file LICENSE.GPL included in the
+ * packaging of this file.  Please review the following information to
+ * ensure the GNU General Public License version 3.0 requirements will be
+ * met: http://www.gnu.org/copyleft/gpl-3.0.html.
+ *
+ * For further information, please contact us at sharemind@cyber.ee.
+ */
+
+import stdlib;
+import shared3p;
+import shared3p_table_database;
+import table_database;
+
+import matrix;
+
+import shared3p_matrix;
+import shared3p_statistics_glm;
+
+import test_utility;
+import test_utility_float;
+
+
+domain pd_shared3p shared3p;
+
+
+void main() {
+        uint columnCount = 30000; // argument("columnCount");
+        string ds = "DS1";//argument("data_source");
+        string tbl = "income"; //argument("table");
+
+        print("Opening connection to data source '", ds, "'.");
+        tdbOpenConnection(ds);
+
+
+        pd_shared3p uint64 c = 1;//sum(a * b);
+        publish("c", c);
+
+
+        uint16 [[1]] age = argument("age");
+        pd_shared3p uint16 [[1]] workclass = argument("workclass");
+        pd_shared3p uint64 [[1]] fnlwgt = argument("fnlwgt");
+        pd_shared3p uint16 [[1]] education = argument("education");
+        pd_shared3p uint16 [[1]] education_num = argument("education_num");
+        pd_shared3p uint16 [[1]] marital_status = argument("marital_status");
+        pd_shared3p uint16 [[1]] occupation = argument("occupation");
+        pd_shared3p uint16 [[1]] relationship = argument("relationship");
+        pd_shared3p uint16 [[1]] race = argument("race");
+        pd_shared3p uint16 [[1]] sex = argument("sex");
+        pd_shared3p uint64 [[1]] capital_gain = argument("capital_gain");
+        pd_shared3p uint64 [[1]] capital_loss = argument("capital_loss");
+        pd_shared3p uint16 [[1]] hours_per_week = argument("hours_per_week");
+        pd_shared3p uint16 [[1]] native_country = argument("native_country");
+        pd_shared3p uint16 [[1]] income = argument("income");
+
+    print( "Vector Age:  ");
+    print("Reading column [age]: ", _vectorToString(age));
+   // for (uint i = 0; i < 15; ++i) {
+     //uint16 tm = age[i];
+    //}
+    print(" end....");
+
+    if (tdbTableExists(ds, tbl)) {
+        print("Table already exists, deleting.");
+        print("remove-table,ds=\"" + ds + "\",name=\"" + tbl + "\"");
+        tdbTableDelete(ds, tbl);
+    }
+
+    print("Creating table from cilent code'", tbl, "' in data source '", ds, "'.");
+    uint params = tdbVmapNew();
+
+    // pd_shared3p uint16 [[1]] age = argument("age");
+    //pd_shared3p uint16 [[1]] age = argument("age");
+    uint16 vtype16;
+    pd_shared3p uint16 vstype16;
+    uint64 vtype64;
+    pd_shared3p uint64 vstype64;
+
+    tdbVmapAddType(params, "types", vtype16);
+    tdbVmapAddString(params, "names", "age");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "workclass");
+
+
+    tdbVmapAddType(params, "types", vstype64);
+    tdbVmapAddString(params, "names", "fnlwgt");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "education");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "education_num");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "marital_status");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "occupation");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "relationship");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "race");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "sex");
+
+    tdbVmapAddType(params, "types", vstype64);
+    tdbVmapAddString(params, "names", "capital_gain");
+
+    tdbVmapAddType(params, "types", vstype64);
+    tdbVmapAddString(params, "names", "capital_loss");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "hours_per_week");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "native_country");
+
+    tdbVmapAddType(params, "types", vstype16);
+    tdbVmapAddString(params, "names", "income");
+
+
+    tdbTableCreate(ds, tbl, params);
+    tdbVmapDelete(params);
+    print("Table created.");
+
+    uint insertParams = tdbVmapNew();
+    tdbVmapSetValueAsColumn(insertParams);
+    tdbVmapAddValue(insertParams, "values", age);
+    tdbVmapAddValue(insertParams, "values",workclass);
+    tdbVmapAddValue(insertParams, "values",fnlwgt);
+    tdbVmapAddValue(insertParams, "values",education);
+    tdbVmapAddValue(insertParams, "values",education_num);
+    tdbVmapAddValue(insertParams, "values",marital_status);
+    tdbVmapAddValue(insertParams, "values",occupation);
+    tdbVmapAddValue(insertParams, "values",relationship);
+    tdbVmapAddValue(insertParams, "values",race);
+    tdbVmapAddValue(insertParams, "values",sex);
+    tdbVmapAddValue(insertParams, "values",capital_gain);
+    tdbVmapAddValue(insertParams, "values",capital_loss);
+    tdbVmapAddValue(insertParams, "values",hours_per_week);
+    tdbVmapAddValue(insertParams, "values",native_country);
+    tdbVmapAddValue(insertParams, "values",income);
+    tdbInsertRow(ds, tbl, insertParams);
+    tdbVmapDelete(insertParams);
+    print("Insert data into table.");
+
+
+{
+    uint names = tdbGetColumnNames(ds, tbl);
+    uint nnames = tdbVmapStringVectorSize(names, "names");
+
+    for (uint i = 0; i < nnames; ++i) {
+        string name = tdbVmapGetString(names, "names", i);
+        print("Column [", i, "] name: \"", name, "\"");
+    }
+}
+{
+    /*
+     * We don't have to use the vmap API because columns have values of a
+     * single type.
+     */
+
+    uint16 [[1]] index = tdbReadColumn(ds, tbl, "age");
+
+    print("Reading column [index]: ", _vectorToString(index));
+
+}
+ int32 [[2]] ageworkclass = reshape(cat(age,workclass), size(age), 2);
+
+}
